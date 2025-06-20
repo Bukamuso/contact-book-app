@@ -1,26 +1,46 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title></title>
-    </head>
-    <body onload="fetchContacts()">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Book</title>
+</head>
+<body onload="fetchContacts()">
 
-        <div id="table">Contacts loading...</div>
-        <button id="refresh" type="button">Refresh</button>
-        <button id="addContact" type="button">Add Contact</button>
+    <div id="table">Contacts loading...</div>
+    <button id="refresh" type="button">Refresh</button>
+    <button id="addContact" type="button">Add Contact</button>
 
-        <script src="config.js"></script>
-        <script>
-            function fetchContacts(){
-                fetch(rootPath + "controller/get-contacts/?apiKey=" + apiKey)
-                .then(function(response){
+    <script src="config.js"></script>
+    <script>
+        function fetchContacts() {
+            console.log("API Key from localStorage:", apiKey);  // ✅ Confirm it's stored
+
+            fetch(rootPath + "/controller/get-contacts/?apiKey=" + apiKey)
+                .then(function (response) {
                     return response.json();
                 })
-                .then(function(data){
-                    //displayOutput(data);
-                    console.log(data);
+                .then(function (data) {
+                    console.log("Data received:", data);
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        let table = "<table border='1'><tr><th>Name</th><th>Number</th></tr>";
+                        for (let contact of data) {
+                            table += `<tr><td>${contact.full_name}</td><td>${contact.phone_number}</td></tr>`;
+                        }
+                        table += "</table>";
+                        document.getElementById("table").innerHTML = table;
+                    } else {
+                        document.getElementById("table").innerText = "No contacts found.";
+                    }
                 })
-            }
-        </script>
-    </body>
+                .catch(function (error) {
+                    console.error("Error fetching contacts:", error);
+                    document.getElementById("table").innerText = "Failed to load contacts.";
+                });
+        }
+
+        // Optional: make Refresh button work
+        document.getElementById("refresh").addEventListener("click", fetchContacts);
+    </script>
+</body>
 </html>
