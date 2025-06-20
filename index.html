@@ -13,22 +13,17 @@
     <script src="config.js"></script>
     <script>
         function fetchContacts() {
-            console.log("API Key from localStorage:", apiKey);  // ✅ Confirm it's stored
+            console.log("API Key from localStorage:", apiKey);
 
             fetch(rootPath + "/controller/get-contacts/?apiKey=" + apiKey)
                 .then(function (response) {
                     return response.json();
                 })
                 .then(function (data) {
-                    console.log("Data received:", data);
+                    console.log(data);
 
                     if (Array.isArray(data) && data.length > 0) {
-                        let table = "<table border='1'><tr><th>Name</th><th>Number</th></tr>";
-                        for (let contact of data) {
-                            table += `<tr><td>${contact.full_name}</td><td>${contact.phone_number}</td></tr>`;
-                        }
-                        table += "</table>";
-                        document.getElementById("table").innerHTML = table;
+                        displayOutput(data);
                     } else {
                         document.getElementById("table").innerText = "No contacts found.";
                     }
@@ -39,7 +34,23 @@
                 });
         }
 
-        // Optional: make Refresh button work
+        function displayOutput(data) {
+            let output = "<table border='1'><tr><th>Avatar</th><th>First Name</th><th>Last Name</th></tr>";
+
+            for (let i in data) {
+                output += `
+                    <tr>
+                        <td><img src="${rootPath}/controller/uploads/${data[i].avatar}" width="40"/></td>
+                        <td>${data[i].firstname}</td>
+                        <td>${data[i].lastname}</td>
+                    </tr>
+                `;
+            }
+
+            output += "</table>";
+            document.getElementById("table").innerHTML = output;
+        }
+
         document.getElementById("refresh").addEventListener("click", fetchContacts);
     </script>
 </body>
